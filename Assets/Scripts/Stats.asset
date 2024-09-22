@@ -29,5 +29,5 @@ MonoBehaviour:
   jumpBuffer: 0.2
   jumpEndEarlyMultiplier: 2
   coyoteTime: 0.1
-  dashVelocity: 30
+  dashVelocity: 40
   dashBuffer: 0.7
