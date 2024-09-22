@@ -1,13 +1,15 @@
 using NaughtyAttributes;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class PlayerAnimationAndEffects : MonoBehaviour
 {
     [SerializeField] SpriteRenderer _sprite;
     [SerializeField] Transform _camTarget;
+    [SerializeField, Tooltip("How much time to wait before the camera target start switching")]
+    float _camTargetSwitchTime;
+    [SerializeField, Tooltip("Time it takes for the camera target to lerp")]
+    float _camTargetSmoothTime;
     [SerializeField] Animator _animator;
     [SerializeField] CameraShakeStats dashShake;
 
@@ -20,20 +22,24 @@ public class PlayerAnimationAndEffects : MonoBehaviour
 
     float _goingBackTime;
     Vector3 _camTargetPos;
-    private IPlayerInterface _player;
+    Coroutine _cameraLerpRoutine;
+    Vector3 _ref = Vector3.zero;
+
+    IPlayerInterface _player;
+
 
     private void Awake()
     {
         if (_sprite == null)
         {
-            if(!TryGetComponent<SpriteRenderer>(out _sprite))
+            if (!TryGetComponent<SpriteRenderer>(out _sprite))
             {
                 Debug.LogError("Sprite renderer not found");
             }
         }
-        if(_animator == null)
+        if (_animator == null)
         {
-            if(!TryGetComponent<Animator>(out _animator))
+            if (!TryGetComponent<Animator>(out _animator))
             {
                 Debug.LogError("Animator not found");
             }
@@ -48,7 +54,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
 
     private void OnEnable()
     {
-        if(_player != null)
+        if (_player != null)
         {
             _player.Jumped += Jumped;
             _player.Grounded += GroundedChanged;
@@ -64,9 +70,9 @@ public class PlayerAnimationAndEffects : MonoBehaviour
             _player.Dashed -= Dashed;
         }
     }
-    private void Update()
+    private void LateUpdate()
     {
-        if(_player == null) return;
+        if (_player == null) return;
 
         HandleSpriteFlip();
         HandleMoveAnimation();
@@ -81,18 +87,35 @@ public class PlayerAnimationAndEffects : MonoBehaviour
         if (_player.PlayerVelocity.x != 0)
         {
             _sprite.flipX = _player.PlayerVelocity.x < 0;
-            HandleCameraTarget();            
+            HandleCameraTarget();
         }
     }
     void HandleCameraTarget()
     {
-        _goingBackTime += _player.PlayerVelocity.x * Time.deltaTime;
-        _goingBackTime = Mathf.Clamp(_goingBackTime, -1, 1);
-        if (Mathf.Abs(_goingBackTime) >= 1)
+        _goingBackTime += Mathf.Sign(_player.PlayerVelocity.x) * Time.deltaTime;
+        _goingBackTime = Mathf.Clamp(_goingBackTime, -_camTargetSwitchTime, _camTargetSwitchTime);
+        if (Mathf.Abs(_goingBackTime) >= _camTargetSwitchTime)
         {
-            Vector3 targetPos = Vector3.MoveTowards(_camTarget.localPosition, _camTargetPos * _player.PlayerVelocity.x, 5 * Time.deltaTime);
+            _cameraLerpRoutine ??= StartCoroutine(LerpCameraTarget());
+        }
+    }
+    IEnumerator LerpCameraTarget()
+    {
+        Vector3 _ref = Vector3.zero;
+        Vector3 targetPos = _camTargetPos * Mathf.Sign(_player.PlayerVelocity.x);
+        if (targetPos != _camTarget.localPosition)
+        {
+            float t = _camTargetSmoothTime;
+            while (targetPos != _camTarget.localPosition)
+            {
+                Vector3 tempPos = Vector3.SmoothDamp(_camTarget.localPosition, targetPos, ref _ref, t);
+                _camTarget.localPosition = tempPos;
+                t -= Time.deltaTime;
+                yield return null;
+            }
             _camTarget.localPosition = targetPos;
         }
+        _cameraLerpRoutine = null;
     }
     void Jumped()
     {
