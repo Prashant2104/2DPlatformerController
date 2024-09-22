@@ -20,6 +20,9 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     [AnimatorParam("_animator")]
     public int groundedkey;
 
+    public float _cameraTargetSwitchTime = 1f;
+    public float _cameraTargetSwitchSpeed = 10f;
+
     float _goingBackTime;
     Vector3 _camTargetPos;
     Coroutine _cameraLerpRoutine;
