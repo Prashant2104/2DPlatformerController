@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     Vector2 _inputVelocity;
     public Vector2 InputVelocity {  get { return _inputVelocity; } set { _inputVelocity = value; } }
 
-
     Vector2 _currentVelocity;
     float _deceleration;
     [SerializeField, ReadOnly] bool _grounded = true;
@@ -63,6 +62,9 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         CheckCeiling();
         HorizontalVelocity();
         Gravity();
+
+        DebugStats.Instance?.LogVelocity(_rb.velocity);
+        DebugStats.Instance?.LogInput(_inputVelocity);
 
         _time += Time.deltaTime;
     }
