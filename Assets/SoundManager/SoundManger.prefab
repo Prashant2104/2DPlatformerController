@@ -76,19 +76,21 @@ MonoBehaviour:
   - sfx: 0
     clips:
     - {fileID: 8300000, guid: 3def8116007348a4f80409a83d897611, type: 3}
-    - {fileID: 8300000, guid: e427a42952315554eacbee07f4668c41, type: 3}
+    - {fileID: 8300000, guid: c8fd81943700b2c4cbf4b9f5a0755c9b, type: 3}
+    - {fileID: 8300000, guid: 2f5a56b9a49f0a24b8d6fe2a5af0eaee, type: 3}
     pitchRange: {x: 0.9, y: 1.1}
     volumeMultiplier: 0.75
   - sfx: 1
     clips:
-    - {fileID: 8300000, guid: 7b1cd7f39df9602498cd04625a9b183d, type: 3}
-    - {fileID: 8300000, guid: 57a3a7a55bf5c2940978ed4ad2a33bab, type: 3}
+    - {fileID: 8300000, guid: c792bb4c8614ae5498a36026469e59ef, type: 3}
+    - {fileID: 8300000, guid: 3e9c7f9c8c417704ebc77cd5a04a421e, type: 3}
     pitchRange: {x: 0.9, y: 1.1}
     volumeMultiplier: 0.75
   - sfx: 2
     clips:
     - {fileID: 8300000, guid: 6f429ca7f011c0c46b89c3a67331382b, type: 3}
-    - {fileID: 8300000, guid: 6ca422a32978fa44590e1d04f09d6d77, type: 3}
+    - {fileID: 8300000, guid: 1cd866d6d5871434794f2453666809ea, type: 3}
+    - {fileID: 8300000, guid: c066f628874fc184c8477b3affe4ce79, type: 3}
     pitchRange: {x: 0.9, y: 1.1}
     volumeMultiplier: 0.75
 --- !u!1 &4174977168091039271
