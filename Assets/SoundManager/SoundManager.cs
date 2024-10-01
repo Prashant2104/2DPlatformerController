@@ -71,6 +71,7 @@ public class SoundManager : MonoBehaviour
         {
             m_musicDictionary.Add(item.bgm, item);
         }
+        m_musicSource.volume = m_bgmVolume;
         PlayMusic(BGM.Bgm1);
     }
 
@@ -155,7 +156,7 @@ public class SoundManager : MonoBehaviour
     // interpolates in log scale (multiplicatively linear) by @FreyaHolmer
     static float Eerp(float a, float b)
     {
-        float t = Random.Range(0, 1);
+        float t = Random.Range(0f, 1f);
         return a * Mathf.Exp(t * Mathf.Log(b / a));
     }
     
