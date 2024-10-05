@@ -121,6 +121,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     {
         _animator.SetTrigger(jumpkey);
         _animator.ResetTrigger(groundedkey);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.jumpSFX, transform.position);
     }
     void GroundedChanged(bool grounded)
     {
@@ -130,5 +131,6 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     void Dashed()
     {
         CameraShake.instance.ShakeDirectional(_player.PlayerVelocity, dashShake);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.dashSFX, transform.position);
     }
 }
