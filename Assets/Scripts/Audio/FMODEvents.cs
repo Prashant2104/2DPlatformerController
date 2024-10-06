@@ -24,4 +24,7 @@ public class FMODEvents : MonoBehaviour
 
     [field: SerializeField]
     public EventReference dashSFX { get; private set; }
+
+    [field: SerializeField]
+    public EventReference playerFootstepsSFX { get; private set; }
 }

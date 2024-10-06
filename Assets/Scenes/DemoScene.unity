@@ -1040,6 +1040,13 @@ MonoBehaviour:
       Data3: 1069141415
       Data4: 6741153
     Path: event:/Dashed
+  <playerFootstepsSFX>k__BackingField:
+    Guid:
+      Data1: 1140893975
+      Data2: 1315121486
+      Data3: 955274129
+      Data4: 1509283522
+    Path: event:/Footsteps
 --- !u!1001 &721921804
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using FMOD.Studio;
 using NaughtyAttributes;
 using System.Collections;
 using UnityEngine;
@@ -20,13 +21,15 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     [AnimatorParam("_animator")]
     public int groundedkey;
 
+    private EventInstance playerFootsteps;
+
+    bool _grounded;
     float _goingBackTime;
     Vector3 _camTargetPos;
     Coroutine _cameraLerpRoutine;
     Vector3 _ref = Vector3.zero;
 
     IPlayerInterface _player;
-
 
     private void Awake()
     {
@@ -51,7 +54,10 @@ public class PlayerAnimationAndEffects : MonoBehaviour
         }
         _camTargetPos = _camTarget.localPosition;
     }
-
+    private void Start()
+    {
+        playerFootsteps = AudioManager.instance.CreateEventInstance(FMODEvents.instance.playerFootstepsSFX);
+    }
     private void OnEnable()
     {
         if (_player != null)
@@ -76,6 +82,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
 
         HandleSpriteFlip();
         HandleMoveAnimation();
+        UpdateFootstepSound();
     }
     void HandleMoveAnimation()
     {
@@ -125,6 +132,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void GroundedChanged(bool grounded)
     {
+        _grounded = grounded;
         if(grounded)
             _animator.SetTrigger(groundedkey);
     }
@@ -132,5 +140,21 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     {
         CameraShake.instance.ShakeDirectional(_player.PlayerVelocity, dashShake);
         AudioManager.instance.PlayOneShot(FMODEvents.instance.dashSFX, transform.position);
+    }
+    void UpdateFootstepSound()
+    {
+        if (_player.PlayerVelocity.x != 0 && _grounded)
+        {
+            PLAYBACK_STATE playbackState;
+            playerFootsteps.getPlaybackState(out playbackState);
+            if(playbackState == PLAYBACK_STATE.STOPPED)
+            {
+                playerFootsteps.start();
+            }
+        }
+        else
+        {
+            playerFootsteps.stop(STOP_MODE.ALLOWFADEOUT);
+        }
     }
 }
