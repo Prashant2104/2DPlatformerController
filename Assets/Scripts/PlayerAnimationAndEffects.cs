@@ -20,13 +20,18 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     [AnimatorParam("_animator")]
     public int groundedkey;
 
+    public SpriteRenderer _staminaBar;
+
+    float _staminaBarWidth;
+    float _staminaRefillTime;
+
+    bool _grounded;
     float _goingBackTime;
     Vector3 _camTargetPos;
     Coroutine _cameraLerpRoutine;
     Vector3 _ref = Vector3.zero;
 
     IPlayerInterface _player;
-
 
     private void Awake()
     {
@@ -51,7 +56,11 @@ public class PlayerAnimationAndEffects : MonoBehaviour
         }
         _camTargetPos = _camTarget.localPosition;
     }
-
+    private void Start()
+    {
+        _staminaBarWidth = _staminaBar.transform.localScale.x;
+        _staminaRefillTime = GetComponentInParent<PlayerController>().stats.dashBuffer;
+    }
     private void OnEnable()
     {
         if (_player != null)
@@ -124,11 +133,53 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void GroundedChanged(bool grounded)
     {
+        _grounded = grounded;
         if(grounded)
             _animator.SetTrigger(groundedkey);
     }
     void Dashed()
     {
         CameraShake.instance.ShakeDirectional(_player.PlayerVelocity, dashShake);
+        StartCoroutine(RefillStamina());
+    }
+    IEnumerator RefillStamina()
+    {
+        _staminaBar.transform.localScale = new Vector3(0, _staminaBar.transform.localScale.y, _staminaBar.transform.localScale.z);
+        _staminaBar.color = Color.white;
+        yield return null;
+
+        Vector3 initialScale = _staminaBar.transform.localScale;
+        Vector3 targetScale = new Vector3(_staminaBarWidth, initialScale.y, initialScale.z);
+        float elapsedTime = 0f;
+
+        while (elapsedTime < _staminaRefillTime)
+        {
+            float t = elapsedTime / _staminaRefillTime;
+            // Use Mathf.Lerp to interpolate between start and end values
+            float newXScale = Mathf.Lerp(0, _staminaBarWidth, t);
+            _staminaBar.transform.localScale = new Vector3(newXScale, initialScale.y, initialScale.z);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final scale is set
+        _staminaBar.transform.localScale = targetScale;
+
+
+        // Fade out the sprite
+        Color initialColor = _staminaBar.color;
+        Color targetColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0f);
+        elapsedTime = 0f;
+
+        while (elapsedTime < 0.1f)
+        {
+            float t = elapsedTime / .1f;
+            _staminaBar.color = Color.Lerp(initialColor, targetColor, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final color is set
+        _staminaBar.color = targetColor;
     }
 }
