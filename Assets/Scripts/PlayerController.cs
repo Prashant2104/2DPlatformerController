@@ -176,16 +176,19 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
             _canDash = false;
             _dashing = true;
             _dashedTime = _time;
+            _jumpEndEarly = false;
             _currentVelocity = Vector2.zero;
+            //StartCoroutine(DashRoutine(_dashVelocity));
             Dashed?.Invoke();
         }
         if (_dashing)
         {
             _currentVelocity = _dashVelocity;
             _dashedFrames++;
-            if(_dashedFrames >= 5)
+            if (_dashedFrames > 5)
             {
                 _dashing = false;
+                _dashedFrames = 0;
                 if (_grounded) _canDash = true;
             }
         }
