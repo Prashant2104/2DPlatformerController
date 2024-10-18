@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         if(_dashInput && _canDash && stats.dashBuffer <= (_time - _dashedTime))
         {
             Vector2 dir = _inputVelocity.normalized;
-            if (_dashInputFrames < 5)
+            if (_dashInputFrames < 3)
             {
                 _dashInputFrames++;
                 return;
