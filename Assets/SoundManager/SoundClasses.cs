@@ -2,7 +2,7 @@ using UnityEngine;
 
 public enum SFX
 {
-    Test1, Test2, Test3
+    Jump, Dash
 }
 public enum BGM
 {
