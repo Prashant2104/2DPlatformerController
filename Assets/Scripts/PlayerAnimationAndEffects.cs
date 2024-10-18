@@ -1,4 +1,3 @@
-using FMOD.Studio;
 using NaughtyAttributes;
 using System.Collections;
 using UnityEngine;
@@ -21,7 +20,10 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     [AnimatorParam("_animator")]
     public int groundedkey;
 
-    private EventInstance playerFootsteps;
+    public SpriteRenderer _staminaBar;
+
+    float _staminaBarWidth;
+    float _staminaRefillTime;
 
     bool _grounded;
     float _goingBackTime;
@@ -56,7 +58,8 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     private void Start()
     {
-        playerFootsteps = AudioManager.instance.CreateEventInstance(FMODEvents.instance.playerFootstepsSFX);
+        _staminaBarWidth = _staminaBar.transform.localScale.x;
+        _staminaRefillTime = GetComponentInParent<PlayerController>().stats.dashBuffer;
     }
     private void OnEnable()
     {
@@ -82,7 +85,6 @@ public class PlayerAnimationAndEffects : MonoBehaviour
 
         HandleSpriteFlip();
         HandleMoveAnimation();
-        UpdateFootstepSound();
     }
     void HandleMoveAnimation()
     {
@@ -128,7 +130,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     {
         _animator.SetTrigger(jumpkey);
         _animator.ResetTrigger(groundedkey);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.jumpSFX, transform.position);
+        SoundManager.instance.PlaySfx(SFX.Jump);
     }
     void GroundedChanged(bool grounded)
     {
@@ -139,22 +141,47 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     void Dashed()
     {
         CameraShake.instance.ShakeDirectional(_player.PlayerVelocity, dashShake);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.dashSFX, transform.position);
+        StartCoroutine(RefillStamina());
+        SoundManager.instance.PlaySfx(SFX.Dash);
     }
-    void UpdateFootstepSound()
+    IEnumerator RefillStamina()
     {
-        if (_player.PlayerVelocity.x != 0 && _grounded)
+        _staminaBar.transform.localScale = new Vector3(0, _staminaBar.transform.localScale.y, _staminaBar.transform.localScale.z);
+        _staminaBar.color = Color.white;
+        yield return null;
+
+        Vector3 initialScale = _staminaBar.transform.localScale;
+        Vector3 targetScale = new Vector3(_staminaBarWidth, initialScale.y, initialScale.z);
+        float elapsedTime = 0f;
+
+        while (elapsedTime < _staminaRefillTime)
         {
-            PLAYBACK_STATE playbackState;
-            playerFootsteps.getPlaybackState(out playbackState);
-            if(playbackState == PLAYBACK_STATE.STOPPED)
-            {
-                playerFootsteps.start();
-            }
+            float t = elapsedTime / _staminaRefillTime;
+            // Use Mathf.Lerp to interpolate between start and end values
+            float newXScale = Mathf.Lerp(0, _staminaBarWidth, t);
+            _staminaBar.transform.localScale = new Vector3(newXScale, initialScale.y, initialScale.z);
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
-        else
+
+        // Ensure final scale is set
+        _staminaBar.transform.localScale = targetScale;
+
+
+        // Fade out the sprite
+        Color initialColor = _staminaBar.color;
+        Color targetColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0f);
+        elapsedTime = 0f;
+
+        while (elapsedTime < 0.1f)
         {
-            playerFootsteps.stop(STOP_MODE.ALLOWFADEOUT);
+            float t = elapsedTime / .1f;
+            _staminaBar.color = Color.Lerp(initialColor, targetColor, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
+
+        // Ensure final color is set
+        _staminaBar.color = targetColor;
     }
 }

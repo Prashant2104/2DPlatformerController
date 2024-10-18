@@ -12,7 +12,7 @@ public interface IPlayerInterface
 }
 public class PlayerController : MonoBehaviour, IPlayerInterface
 {
-    [SerializeField, Expandable] ControllerStatsScriptable stats;
+    [Expandable] public ControllerStatsScriptable stats;
 
     Vector2 _inputVelocity;
     public Vector2 InputVelocity {  get { return _inputVelocity; } set { _inputVelocity = value; } }
@@ -32,8 +32,10 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     [SerializeField, ReadOnly] int _jumpCount = 0;
 
     bool _dashing;
+    bool _dashInput;
     [SerializeField, ReadOnly] bool _canDash;
     float _dashedTime;
+    Vector2 _dashVelocity;
 
     float _facingDirection = 1;
 
@@ -58,10 +60,15 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     }
     private void FixedUpdate()
     {
+        _rb.velocity = _currentVelocity;
+
         CheckGrounded();
         CheckCeiling();
         HorizontalVelocity();
+        HandleDash();
         Gravity();
+
+        DebugDirection();
 
         DebugStats.Instance?.LogVelocity(_rb.velocity);
         DebugStats.Instance?.LogInput(_inputVelocity);
@@ -71,7 +78,7 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     public void HorizontalVelocity()
     {
         if(_dashing) return;
-        if (Mathf.Abs(_inputVelocity.x) < stats.deadZone)
+        if (Mathf.Abs(_inputVelocity.x) < stats.deadZone || Mathf.Abs(_rb.velocity.x) > stats.maxSpeed)
         {
             _deceleration = _grounded ? stats.groundDeceleration : stats.airDeceleration;
             _currentVelocity.x = Mathf.MoveTowards(_currentVelocity.x, 0, _deceleration * Time.deltaTime);
@@ -81,7 +88,6 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
             _facingDirection = Mathf.CeilToInt(_inputVelocity.x);
             _currentVelocity.x = Mathf.MoveTowards(_currentVelocity.x, stats.maxSpeed * _inputVelocity.x, stats.acceleration * Time.deltaTime);
         }
-        _rb.velocity = _currentVelocity;
     }
     public void HandleJump()
     {
@@ -135,39 +141,82 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     }
     public void Dash()
     {
-        if (!_dashing && _canDash && stats.dashBuffer <= (_time - _dashedTime))
+        _dashInput = true;
+        //if (!_dashing && _canDash && stats.dashBuffer <= (_time - _dashedTime))
+        //{
+        //    Dashed?.Invoke();
+        //    _dashedTime = _time;
+        //    _dashing = true;
+        //    _canDash = false;
+        //    _jumpEndEarly = false;
+        //    if (_inputVelocity.magnitude > 0)
+        //    {
+        //        Vector2 _dir = _inputVelocity.normalized;
+        //        StartCoroutine(DashRoutine(_dir));
+        //    }
+        //    else
+        //    {
+        //        Vector2 _dir = new Vector2(_facingDirection, 0);
+        //        StartCoroutine(DashRoutine(_dir));
+        //    }
+        //}
+    }
+    int _dashedFrames = 0;
+    int _dashInputFrames = 0;
+    void HandleDash()
+    {
+        if(_dashInput && _canDash && stats.dashBuffer <= (_time - _dashedTime))
         {
-            Dashed?.Invoke();
-            _dashedTime = _time;
-            _dashing = true;
-            _canDash = false;
-            _jumpEndEarly = false;
-            if (_inputVelocity.magnitude > 0)
+            Vector2 dir = _inputVelocity.normalized;
+            if (_dashInputFrames < 3)
             {
-                Vector2 _dir = _inputVelocity.normalized;
-                StartCoroutine(DashRoutine(_dir));
+                _dashInputFrames++;
+                return;
             }
-            else
+            if (dir != Vector2.zero)
             {
-                Vector2 _dir = new Vector2(_facingDirection, 0);
-                StartCoroutine(DashRoutine(_dir));
+                _dashInputFrames = 0;
+                _dashInput = false;
+                _dashVelocity = dir * stats.dashVelocity;
+                _canDash = false;
+                _dashing = true;
+                _dashedTime = _time;
+                _jumpEndEarly = false;
+                _currentVelocity = Vector2.zero;
+                //StartCoroutine(DashRoutine(_dashVelocity));
+                Dashed?.Invoke();
             }
         }
+        if (_dashing)
+        {
+            _currentVelocity = _dashVelocity;
+            _dashedFrames++;
+            if (_dashedFrames > 5)
+            {
+                _dashing = false;
+                _dashedFrames = 0;
+                _dashInput = false;
+                if (_grounded) _canDash = true;
+            }
+        }
+        _dashInputFrames = 0;
+        _dashInput = false;
     }
+
     IEnumerator DashRoutine(Vector2 _dir)
     {
-        Vector2 initialVelocity = _rb.velocity;
+        //Vector2 initialVelocity = _rb.velocity;
         _rb.velocity = Vector2.zero;
-        float t = 0;
-        while (t < 0.05f && _dashing)
+        int t = 0;
+        while (t < 10 && _dashing)
         {
-            t += Time.deltaTime;
-            _currentVelocity.x = stats.dashVelocity * _dir.x;
-            _currentVelocity.y = stats.dashVelocity * _dir.y;
+            t++;
+            _currentVelocity = stats.dashVelocity * _dir;
+            //_currentVelocity.y = stats.dashVelocity * _dir.y;
             _rb.velocity = _currentVelocity;
             yield return null;
         }
-        _rb.velocity = initialVelocity / 2;
+        _rb.velocity = Vector2.zero;
         _dashing = false;
         if(_grounded) _canDash = true;
     }
@@ -239,5 +288,11 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         yield return new WaitForSeconds(stats.coyoteTime);
         _grounded = false;
         _inCoyoteTime = false;
+    }
+
+    [SerializeField] Transform inputDirectionVisual;
+    void DebugDirection()
+    {
+        inputDirectionVisual.transform.localPosition = new Vector3(_inputVelocity.x, _inputVelocity.y, 0);
     }
 }
