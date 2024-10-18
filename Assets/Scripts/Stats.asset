@@ -20,7 +20,7 @@ MonoBehaviour:
   maxSpeed: 12
   acceleration: 60
   groundDeceleration: 50
-  airDeceleration: 10
+  airDeceleration: 30
   maxJumpCount: 2
   jumpPower: 22
   groundingAcceleration: 2
@@ -29,5 +29,5 @@ MonoBehaviour:
   jumpBuffer: 0.2
   jumpEndEarlyMultiplier: 2
   coyoteTime: 0.1
-  dashVelocity: 40
+  dashVelocity: 30
   dashBuffer: 1

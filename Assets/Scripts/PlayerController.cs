@@ -162,24 +162,30 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         //}
     }
     int _dashedFrames = 0;
+    int _dashInputFrames = 0;
     void HandleDash()
     {
         if(_dashInput && _canDash && stats.dashBuffer <= (_time - _dashedTime))
         {
             Vector2 dir = _inputVelocity.normalized;
-            if(dir == Vector2.zero)
+            if (_dashInputFrames < 5)
             {
-                _dashInput = false;
+                _dashInputFrames++;
                 return;
             }
-            _dashVelocity = dir * stats.dashVelocity;
-            _canDash = false;
-            _dashing = true;
-            _dashedTime = _time;
-            _jumpEndEarly = false;
-            _currentVelocity = Vector2.zero;
-            //StartCoroutine(DashRoutine(_dashVelocity));
-            Dashed?.Invoke();
+            if (dir != Vector2.zero)
+            {
+                _dashInputFrames = 0;
+                _dashInput = false;
+                _dashVelocity = dir * stats.dashVelocity;
+                _canDash = false;
+                _dashing = true;
+                _dashedTime = _time;
+                _jumpEndEarly = false;
+                _currentVelocity = Vector2.zero;
+                //StartCoroutine(DashRoutine(_dashVelocity));
+                Dashed?.Invoke();
+            }
         }
         if (_dashing)
         {
@@ -189,9 +195,11 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
             {
                 _dashing = false;
                 _dashedFrames = 0;
+                _dashInput = false;
                 if (_grounded) _canDash = true;
             }
         }
+        _dashInputFrames = 0;
         _dashInput = false;
     }
 
