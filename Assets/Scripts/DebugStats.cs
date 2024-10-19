@@ -1,3 +1,5 @@
+using NaughtyAttributes;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,11 +7,15 @@ public class DebugStats : MonoBehaviour
 {
     [SerializeField] Text _debugTMP;
     string[] _debugText;
+    [SerializeField, Expandable] ControllerStatsScriptable stats;
+
+    public Slider s_maxVelocity, s_acceleration, s_deacceleration, s_jumpPower, s_fallPower, s_dashVelocity;
+    public Text t_maxVelocity, t_acceleration, t_deacceleration, t_jumpPower, t_fallPower, t_dashVelocity;
 
     public static DebugStats Instance;
     private void Awake()
     {
-        _debugText = new string[2];
+        _debugText = new string[3];
         if (Instance == null)
         {
             Instance = this;
@@ -19,15 +25,48 @@ public class DebugStats : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
+        s_maxVelocity.value = stats.maxSpeed;
+        s_acceleration.value = stats.acceleration;
+        s_deacceleration.value = stats.groundDeceleration;
+        s_jumpPower.value = stats.jumpPower;
+        s_fallPower.value = stats.fallAcceleration;
+        s_dashVelocity.value = stats.dashVelocity;
 
+        t_maxVelocity.text = "Speed: " + stats.maxSpeed.ToString();
+        t_acceleration.text = "Acc: " + stats.acceleration.ToString();
+        t_deacceleration.text = "Deacc: " + stats.groundDeceleration.ToString();
+        t_jumpPower.text = "Jump: " + stats.jumpPower.ToString();
+        t_fallPower.text = "Fall: " + stats.fallAcceleration.ToString();
+        t_dashVelocity.text = "Dash: " + stats.dashVelocity.ToString();
+
+        s_maxVelocity.onValueChanged.AddListener((i) => { stats.maxSpeed = i; t_maxVelocity.text = "Speed: " + i.ToString(); });
+        s_acceleration.onValueChanged.AddListener(i => { stats.acceleration = i; t_acceleration.text = "Acc: " + i.ToString(); });
+        s_deacceleration.onValueChanged.AddListener(i => { stats.groundDeceleration = i; t_deacceleration.text = "Deacc: " + i.ToString(); });
+        s_jumpPower.onValueChanged.AddListener(i => { stats.jumpPower = i; t_jumpPower.text = "Jump: " + i.ToString(); });
+        s_fallPower.onValueChanged.AddListener(i => { stats.fallAcceleration = i; t_fallPower.text = "Fall: " + i.ToString(); });
+        s_dashVelocity.onValueChanged.AddListener(i => { stats.dashVelocity = i; t_dashVelocity.text = "Dash: " + i.ToString(); });
+
+        StartCoroutine(FPS());
+    }
+    IEnumerator FPS()
+    {
+        while (true)
+        {
+            LogFPS(1 / Time.deltaTime);
+            yield return new WaitForSeconds(0.25f);
+        }
+    }
     public void LogVelocity(Vector3 velocity)
     {
-        _debugText[0] = "speed: " + velocity.ToString();
+        _debugText[1] = "speed: " + velocity.ToString();
     }
     public void LogInput(Vector2 input)
     {
-        _debugText[1] = "input: " + input.ToString();
+        _debugText[2] = "input: " + input.ToString();
+    }
+    public void LogFPS(float fps)
+    {
+        _debugText[0] = "FPS: " + fps.ToString("n2");
     }
     private void LateUpdate()
     {
