@@ -1,6 +1,4 @@
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
-
 public class InputHandler : MonoBehaviour
 {
     public PlayerController player;
@@ -23,7 +21,7 @@ public class InputHandler : MonoBehaviour
             _controller.Character.Walk.performed += i => player.InputVelocity = i.ReadValue<Vector2>();
             _controller.Character.Jump.performed += i => { player.HandleJump(); };
             _controller.Character.Jump.canceled += i => { player.JumpReleased(); };
-            _controller.Character.Dash.performed += i => { player.Dash(); };
+            _controller.Character.Dash.performed += i => { player.DashInput(); };
         }
         _controller.Enable();
     }

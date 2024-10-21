@@ -1114,6 +1114,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1434622419005288984, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
   m_PrefabInstance: {fileID: 7743024055655206438}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &420397190 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3587763491467669553, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
+  m_PrefabInstance: {fileID: 7743024055655206438}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f03c0503bf813bf4fb8d2577c5d2269a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &420737157
 GameObject:
   m_ObjectHideFlags: 0
@@ -3316,6 +3327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 208a5495e34c19347a2a699fd1940828, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 420397190}
   _debugTMP: {fileID: 659803012}
   stats: {fileID: 11400000, guid: d3540dc19caf3264b9b5396db4271127, type: 2}
   s_maxVelocity: {fileID: 1735125993}
@@ -3330,6 +3342,7 @@ MonoBehaviour:
   t_jumpPower: {fileID: 125943712}
   t_fallPower: {fileID: 2089178804}
   t_dashVelocity: {fileID: 1542642036}
+  inputDirectionVisual: {fileID: 770354101}
 --- !u!1 &1092503529
 GameObject:
   m_ObjectHideFlags: 0
@@ -6680,6 +6693,14 @@ PrefabInstance:
     - target: {fileID: 4372569964971304957, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5641831271089939257, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
+      propertyPath: _camTargetSmoothTime
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5641831271089939257, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
+      propertyPath: _camTargetSwitchTime
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5673703306058477936, guid: 39a4f6019d4dd914db8a5389c4c760a3, type: 3}
       propertyPath: m_Time

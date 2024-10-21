@@ -88,20 +88,20 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void HandleMoveAnimation()
     {
-        float absVelocity = Mathf.Abs(_player.PlayerVelocity.x);
+        float absVelocity = Mathf.Abs(_player.InputDirection.x);
         _animator.SetFloat(animatorSpeedkey, Mathf.Lerp(0, 1, absVelocity));
     }
     void HandleSpriteFlip()
     {
-        if (_player.PlayerVelocity.x != 0)
+        if (_player.InputDirection.x != 0)
         {
-            _sprite.flipX = _player.PlayerVelocity.x < 0;
+            _sprite.flipX = _player.InputDirection.x < 0;
             HandleCameraTarget();
         }
     }
     void HandleCameraTarget()
     {
-        _goingBackTime += Mathf.Sign(_player.PlayerVelocity.x) * Time.deltaTime;
+        _goingBackTime += Mathf.Sign(_player.InputDirection.x) * Time.deltaTime;
         _goingBackTime = Mathf.Clamp(_goingBackTime, -_camTargetSwitchTime, _camTargetSwitchTime);
         if (Mathf.Abs(_goingBackTime) >= _camTargetSwitchTime)
         {
@@ -111,7 +111,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     IEnumerator LerpCameraTarget()
     {
         Vector3 _ref = Vector3.zero;
-        Vector3 targetPos = _camTargetPos * Mathf.Sign(_player.PlayerVelocity.x);
+        Vector3 targetPos = _camTargetPos * Mathf.Sign(_player.InputDirection.x);
         if (targetPos != _camTarget.localPosition)
         {
             float t = _camTargetSmoothTime;
@@ -140,7 +140,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void Dashed()
     {
-        CameraShake.instance.ShakeDirectional(_player.PlayerVelocity, dashShake);
+        CameraShake.instance.ShakeDirectional(_player.InputDirection, dashShake);
         StartCoroutine(RefillStamina());
         SoundManager.instance.PlaySfx(SFX.Dash);
     }

@@ -8,6 +8,7 @@ public interface IPlayerInterface
     public event Action Jumped;
     public event Action<bool> Grounded;
     public event Action Dashed;
+    public Vector2 InputDirection { get; }
     public Vector2 PlayerVelocity { get; }
 }
 public class PlayerController : MonoBehaviour, IPlayerInterface
@@ -19,21 +20,22 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
 
     Vector2 _currentVelocity;
     float _deceleration;
-    [SerializeField, ReadOnly] bool _grounded = true;
+    bool _grounded = true;
     bool _inCoyoteTime = true;
-    [SerializeField, ReadOnly] bool _jumpEndEarly;
+    bool _jumpEndEarly;
 
     Coroutine _jumpCoroutine = null;
     Coroutine _coyoteCoroutine = null;
 
     float _time = 0;
+
     float _jumpPressTime = 0;
     float _jumpReleaseTime = 0;
-    [SerializeField, ReadOnly] int _jumpCount = 0;
+    int _jumpCount = 0;
 
     bool _dashing;
     bool _dashInput;
-    [SerializeField, ReadOnly] bool _canDash;
+    bool _canDash;
     float _dashedTime;
     Vector2 _dashVelocity;
 
@@ -42,7 +44,8 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
     Collider2D _col;
     Rigidbody2D _rb;
 
-    public Vector2 PlayerVelocity => _inputVelocity;
+    public Vector2 InputDirection => _inputVelocity;
+    public Vector2 PlayerVelocity => _rb.velocity;
     public event Action Jumped;
     public event Action<bool> Grounded;
     public event Action Dashed;
@@ -67,11 +70,6 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         HorizontalVelocity();
         HandleDash();
         Gravity();
-
-        DebugDirection();
-
-        DebugStats.Instance?.LogVelocity(_rb.velocity);
-        DebugStats.Instance?.LogInput(_inputVelocity);
 
         _time += Time.deltaTime;
     }
@@ -139,27 +137,9 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
             yield return null;
         }
     }
-    public void Dash()
+    public void DashInput()
     {
         _dashInput = true;
-        //if (!_dashing && _canDash && stats.dashBuffer <= (_time - _dashedTime))
-        //{
-        //    Dashed?.Invoke();
-        //    _dashedTime = _time;
-        //    _dashing = true;
-        //    _canDash = false;
-        //    _jumpEndEarly = false;
-        //    if (_inputVelocity.magnitude > 0)
-        //    {
-        //        Vector2 _dir = _inputVelocity.normalized;
-        //        StartCoroutine(DashRoutine(_dir));
-        //    }
-        //    else
-        //    {
-        //        Vector2 _dir = new Vector2(_facingDirection, 0);
-        //        StartCoroutine(DashRoutine(_dir));
-        //    }
-        //}
     }
     int _dashedFrames = 0;
     int _dashInputFrames = 0;
@@ -183,7 +163,6 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
                 _dashedTime = _time;
                 _jumpEndEarly = false;
                 _currentVelocity = Vector2.zero;
-                //StartCoroutine(DashRoutine(_dashVelocity));
                 Dashed?.Invoke();
             }
         }
@@ -201,24 +180,6 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         }
         _dashInputFrames = 0;
         _dashInput = false;
-    }
-
-    IEnumerator DashRoutine(Vector2 _dir)
-    {
-        //Vector2 initialVelocity = _rb.velocity;
-        _rb.velocity = Vector2.zero;
-        int t = 0;
-        while (t < 10 && _dashing)
-        {
-            t++;
-            _currentVelocity = stats.dashVelocity * _dir;
-            //_currentVelocity.y = stats.dashVelocity * _dir.y;
-            _rb.velocity = _currentVelocity;
-            yield return null;
-        }
-        _rb.velocity = Vector2.zero;
-        _dashing = false;
-        if(_grounded) _canDash = true;
     }
     void Gravity()
     {
@@ -288,11 +249,5 @@ public class PlayerController : MonoBehaviour, IPlayerInterface
         yield return new WaitForSeconds(stats.coyoteTime);
         _grounded = false;
         _inCoyoteTime = false;
-    }
-
-    [SerializeField] Transform inputDirectionVisual;
-    void DebugDirection()
-    {
-        inputDirectionVisual.transform.localPosition = new Vector3(_inputVelocity.x, _inputVelocity.y, 0);
     }
 }

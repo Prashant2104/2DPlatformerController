@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class DebugStats : MonoBehaviour
 {
+    public PlayerController playerController;
+    IPlayerInterface _player;
     [SerializeField] Text _debugTMP;
     string[] _debugText;
     [SerializeField, Expandable] ControllerStatsScriptable stats;
@@ -12,19 +14,11 @@ public class DebugStats : MonoBehaviour
     public Slider s_maxVelocity, s_acceleration, s_deacceleration, s_jumpPower, s_fallPower, s_dashVelocity;
     public Text t_maxVelocity, t_acceleration, t_deacceleration, t_jumpPower, t_fallPower, t_dashVelocity;
 
-    public static DebugStats Instance;
     private void Awake()
     {
+        _player = playerController.GetComponent<IPlayerInterface>();
         _debugText = new string[3];
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+
         s_maxVelocity.value = stats.maxSpeed;
         s_acceleration.value = stats.acceleration;
         s_deacceleration.value = stats.groundDeceleration;
@@ -56,20 +50,31 @@ public class DebugStats : MonoBehaviour
             yield return new WaitForSeconds(0.25f);
         }
     }
-    public void LogVelocity(Vector3 velocity)
+    [SerializeField] Transform inputDirectionVisual;
+    void DebugDirection()
+    {
+        inputDirectionVisual.transform.localPosition = new Vector3(_player.InputDirection.x, _player.InputDirection.y, 0);
+    }
+    void LogVelocity(Vector3 velocity)
     {
         _debugText[1] = "speed: " + velocity.ToString();
     }
-    public void LogInput(Vector2 input)
+    void LogInput(Vector2 input)
     {
         _debugText[2] = "input: " + input.ToString();
     }
-    public void LogFPS(float fps)
+    void LogFPS(float fps)
     {
         _debugText[0] = "FPS: " + fps.ToString("n2");
     }
     private void LateUpdate()
     {
         _debugTMP.text = "DEBUG \n" + string.Join("\n", _debugText);
+    }
+    private void FixedUpdate()
+    {
+        LogVelocity(_player.PlayerVelocity);
+        LogInput(_player.InputDirection);
+        DebugDirection();
     }
 }
