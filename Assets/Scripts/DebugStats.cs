@@ -13,6 +13,7 @@ public class DebugStats : MonoBehaviour
 
     public Slider s_maxVelocity, s_acceleration, s_deacceleration, s_jumpPower, s_fallPower, s_dashVelocity;
     public Text t_maxVelocity, t_acceleration, t_deacceleration, t_jumpPower, t_fallPower, t_dashVelocity;
+    public float r_maxVelocity, r_acceleration, r_deacceleration, r_jumpPower, r_fallPower, r_dashVelocity;
 
     private void Awake()
     {
@@ -40,7 +41,31 @@ public class DebugStats : MonoBehaviour
         s_fallPower.onValueChanged.AddListener(i => { stats.fallAcceleration = i; t_fallPower.text = "Fall: " + i.ToString(); });
         s_dashVelocity.onValueChanged.AddListener(i => { stats.dashVelocity = i; t_dashVelocity.text = "Dash: " + i.ToString(); });
 
+
+        r_maxVelocity = stats.maxSpeed;
+        r_acceleration = stats.acceleration;
+        r_deacceleration = stats.groundDeceleration;
+        r_jumpPower = stats.jumpPower;
+        r_fallPower = stats.fallAcceleration;
+        r_dashVelocity = stats.dashVelocity;
+
         StartCoroutine(FPS());
+    }
+    public void ResetValues()
+    {
+        stats.maxSpeed = r_maxVelocity;
+        stats.acceleration = r_acceleration;
+        stats.groundDeceleration = r_deacceleration;
+        stats.jumpPower = r_jumpPower;
+        stats.fallAcceleration = r_fallPower;
+        stats.dashVelocity = r_dashVelocity;
+
+        s_maxVelocity.value = stats.maxSpeed;
+        s_acceleration.value = stats.acceleration;
+        s_deacceleration.value = stats.groundDeceleration;
+        s_jumpPower.value = stats.jumpPower;
+        s_fallPower.value = stats.fallAcceleration;
+        s_dashVelocity.value = stats.dashVelocity;
     }
     IEnumerator FPS()
     {
