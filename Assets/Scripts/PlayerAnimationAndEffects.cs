@@ -128,9 +128,9 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void Jumped()
     {
+        SoundManager.instance.PlaySfx(SFX.Jump);
         _animator.SetTrigger(jumpkey);
         _animator.ResetTrigger(groundedkey);
-        SoundManager.instance.PlaySfx(SFX.Jump);
     }
     void GroundedChanged(bool grounded)
     {
@@ -140,9 +140,9 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     }
     void Dashed()
     {
+        SoundManager.instance.PlaySfx(SFX.Dash);
         CameraShake.instance.ShakeDirectional(_player.InputDirection, dashShake);
         StartCoroutine(RefillStamina());
-        SoundManager.instance.PlaySfx(SFX.Dash);
     }
     IEnumerator RefillStamina()
     {
