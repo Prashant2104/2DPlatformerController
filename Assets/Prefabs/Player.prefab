@@ -121,8 +121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprite: {fileID: 4735753690501088523}
   _camTarget: {fileID: 8828193492982541732}
-  _camTargetSwitchTime: 0.3
-  _camTargetSmoothTime: 0.5
+  _camTargetSwitchTime: 0.25
+  _camTargetSmoothTime: 0.25
   _animator: {fileID: 3596890723426998179}
   dashShake:
     _magnitude: 0.25
@@ -196,10 +196,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: d3540dc19caf3264b9b5396db4271127, type: 2}
-  _grounded: 1
-  _jumpEndEarly: 0
-  _jumpCount: 0
-  _canDash: 0
 --- !u!50 &4245054655245045114
 Rigidbody2D:
   serializedVersion: 4
@@ -430,7 +426,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Time: 0.3
+  m_Time: 1
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -486,7 +482,7 @@ TrailRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 5
