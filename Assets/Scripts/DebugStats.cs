@@ -17,6 +17,11 @@ public class DebugStats : MonoBehaviour
 
     private void Awake()
     {
+#if PLATFORM_ANDROID && !UNITY_EDITOR
+        Application.targetFrameRate = 120;
+#else
+        Application.targetFrameRate = -1;
+#endif
         _player = playerController.GetComponent<IPlayerInterface>();
         _debugText = new string[3];
 
