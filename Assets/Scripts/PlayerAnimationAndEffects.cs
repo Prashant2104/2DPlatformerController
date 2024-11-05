@@ -9,7 +9,7 @@ public class PlayerAnimationAndEffects : MonoBehaviour
     [SerializeField, Tooltip("How much time to wait before the camera target start switching")]
     float _camTargetSwitchTime;
     [SerializeField, Tooltip("Time it takes for the camera target to lerp")]
-    float _camTargetSmoothTime;
+    public float _camTargetSmoothTime;
     [SerializeField] Animator _animator;
     [SerializeField] CameraShakeStats dashShake;
 
